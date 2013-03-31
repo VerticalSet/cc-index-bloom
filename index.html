@@ -1,1 +1,88 @@
-My GitHub Page
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Get JS bloom filter from common crawl index</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+    <script src="https://raw.github.com/bgrins/filereader.js/master/filereader.js"></script>
+  </head>
+  <body>
+    <input type="file" id="ccfile"></input>
+
+  </body>
+  <script>
+    var fileContent = null;
+    $("#ccfile").fileReaderJS({
+      dragClass: "drag",
+      accept: false,
+      readAsMap: {
+          'image/*': 'DataURL',
+          'text/*' : 'Text'
+      },
+      readAsDefault: 'Text',
+      on: {
+        beforestart: function(e, file) {
+          // return false if you want to skip this file
+
+        },
+          loadstart: function(e, file) {
+            // Native ProgressEvent
+
+        },
+          progress: function(e, file) {
+            // Native ProgressEvent
+
+        },
+          load: function(e, file) {
+            // Native ProgressEvent
+
+        },
+          error: function(e, file) {
+            // Native ProgressEvent
+
+        },
+          loadend: function(e, file) {
+            // Native ProgressEvent
+            var fileContent = e.target.result;
+            var regExp = new RegExp("^http://api.jquery.com/(?:jQuery\.)?([^\/]+)/$");
+            var urls = $.map(fileContent.split("\n"), function(line){
+              if ( !line ) return;
+              var url=null;
+              try
+              {
+                url = JSON.parse(line).url;
+              }
+              catch(err)
+              {
+                console.log("could not parse line : '" + line + "'")
+                return null;
+              }
+              var matchData = url.match(regExp);
+              if ( matchData && matchData.length > 0 ) {
+                entity = matchData[1];
+                return entity;
+              }
+              else {
+                return null;
+              }
+            });
+            console.log(urls);
+        },
+          abort: function(e, file) {
+            // Native ProgressEvent
+
+        },
+          skip: function(e, file) {
+            // Called when a file is skipped.  This happens when:
+            //  1) A file doesn't match the accept option
+            //  2) false is returned in the beforestart callback
+        },
+          groupstart: function(group) {
+
+        },
+          groupend: function(group) {
+
+        }
+      }
+    });
+  </script>
+</html>
