@@ -1,88 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html ng-app>
   <head>
     <title>Get JS bloom filter from common crawl index</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
     <script src="https://raw.github.com/bgrins/filereader.js/master/filereader.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    <script src="support.js"></script>
+    <script src="main.js"></script>
+    <script href="bootstrap-fileupload.js" ></script>
+
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="bootstrap-fileupload.css" rel="stylesheet"></link>
   </head>
   <body>
-    <input type="file" id="ccfile"></input>
-
+    <div class="container">
+      <div id="mainForm" class="span8 offset2" ng-controller="MainCtrl">
+        <form ng-submit="">
+          <br />
+          <div class="control-group">
+            <label class="control-label" for="inputRegex">Regular Expression</label>
+            <div class="controls">
+              <input type="text" id="inputRegex" placeholder="Regular expression" ng-model="regexp" ng-change="extractSample()" style="width:400px;" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="inputFile">URL Tool File</label>
+            <div class="controls">
+              <div class="fileupload fileupload-new" data-provides="fileupload" style="display:none;">
+                <span class="btn btn-file"><span class="fileupload-new">Select file</span><span class="fileupload-exists">Change</span><input type="file" id="ccfile_old" /></span>
+                <span class="fileupload-preview"></span>
+                <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none">×</a>
+              </div>
+              <input id="ccfile" type="file" style="line-height:15px;height:auto;" ></input>
+            </div>
+          </div>
+          <div class="control-group">
+            <label for="inputSampleEntities"><input type="checkbox" ng-model="options['strip']" style="display:inline-block;margin:0;" ng-change="extractSample()" /> Strip</label>
+            <label for="inputSampleEntities" ><input type="checkbox" ng-model="options['urlDecode']" style="display:inline-block;margin:0;" ng-change="extractSample()" /> URL Decode</label>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="inputSampleEntities">Sample entities</label>
+            <div class="controls">
+              <textarea type="password" id="inputSampleEntities" placeholder="Sample Entities" readonly="readonly" rows="8" ng-model="sampleEntities" style="width:400px;"></textarea>
+            </div>
+          </div>
+          <button class="btn">Submit</button>
+        </form>
+      </div>
+    </div>
   </body>
-  <script>
-    var fileContent = null;
-    $("#ccfile").fileReaderJS({
-      dragClass: "drag",
-      accept: false,
-      readAsMap: {
-          'image/*': 'DataURL',
-          'text/*' : 'Text'
-      },
-      readAsDefault: 'Text',
-      on: {
-        beforestart: function(e, file) {
-          // return false if you want to skip this file
-
-        },
-          loadstart: function(e, file) {
-            // Native ProgressEvent
-
-        },
-          progress: function(e, file) {
-            // Native ProgressEvent
-
-        },
-          load: function(e, file) {
-            // Native ProgressEvent
-
-        },
-          error: function(e, file) {
-            // Native ProgressEvent
-
-        },
-          loadend: function(e, file) {
-            // Native ProgressEvent
-            var fileContent = e.target.result;
-            var regExp = new RegExp("^http://api.jquery.com/(?:jQuery\.)?([^\/]+)/$");
-            var urls = $.map(fileContent.split("\n"), function(line){
-              if ( !line ) return;
-              var url=null;
-              try
-              {
-                url = JSON.parse(line).url;
-              }
-              catch(err)
-              {
-                console.log("could not parse line : '" + line + "'")
-                return null;
-              }
-              var matchData = url.match(regExp);
-              if ( matchData && matchData.length > 0 ) {
-                entity = matchData[1];
-                return entity;
-              }
-              else {
-                return null;
-              }
-            });
-            console.log(urls);
-        },
-          abort: function(e, file) {
-            // Native ProgressEvent
-
-        },
-          skip: function(e, file) {
-            // Called when a file is skipped.  This happens when:
-            //  1) A file doesn't match the accept option
-            //  2) false is returned in the beforestart callback
-        },
-          groupstart: function(group) {
-
-        },
-          groupend: function(group) {
-
-        }
-      }
-    });
-  </script>
 </html>
